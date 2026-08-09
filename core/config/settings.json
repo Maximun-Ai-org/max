@@ -1,0 +1,31 @@
+{
+  "agent": {
+    "name": "Máximun",
+    "type": "hermes",
+    "version": "0.1.0",
+    "language": "es"
+  },
+  "device": {
+    "platform": "android",
+    "proot": true,
+    "shizuku": false
+  },
+  "memory": {
+    "max_context_tokens": 8000,
+    "short_term_size": 20,
+    "long_term_enabled": true
+  },
+  "skills": {
+    "auto_load": true,
+    "directory": "skills/plugins"
+  },
+  "tools": {
+    "device_access": true,
+    "web_access": false,
+    "filesystem_access": true
+  },
+  "logging": {
+    "level": "info",
+    "directory": "logs"
+  }
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "name": "test_task",
+    "action": "heartbeat",
+    "interval": 60,
+    "once": false,
+    "enabled": true,
+    "last_run": null,
+    "created": "2026-07-17T04:59:18.006667"
+  },
+  {
+    "name": "test",
+    "action": "heartbeat",
+    "interval": 60,
+    "once": false,
+    "enabled": true,
+    "last_run": null,
+    "created": "2026-07-17T05:10:48.642947"
+  }
+]

@@ -1,0 +1,18 @@
+[Unit]
+Description=Máximun Agent Autonomous Daemon
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/Máximun_proyect
+ExecStart=/root/Máximun_proyect/scripts/autonomous_daemon.sh
+Restart=always
+RestartSec=30
+Environment=PYTHONUNBUFFERED=1
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

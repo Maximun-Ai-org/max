@@ -1,0 +1,33 @@
+# Raspberry Pi 4B Configuration for Máximun Agent
+# Optimizado para 24/7 con refrigeración pasiva
+
+# Overclocking seguro (con disipador de aluminio)
+over_voltage=2
+arm_freq=1800
+gpu_freq=500
+
+# Memoria
+gpu_mem=64
+
+# Interfaces habilitadas
+dtparam=i2c_arm=on
+dtparam=spi=on
+dtparam=audio=on
+
+# Audio Jack nativo
+dtparam=audio=on
+audio_pwm_mode=2
+
+# Ethernet (preferido sobre WiFi para 24/7)
+dtoverlay=rpi-poe 2>/dev/null || true
+
+# GPIO
+dtparam=gpio=on
+dtparam=gpio_watchdog=on
+
+# Temperatura — throttling seguro
+temp_limit=80
+
+# Boot rápido
+boot_delay=0
+avoid_warnings=1

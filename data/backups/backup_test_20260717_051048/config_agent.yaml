@@ -1,0 +1,167 @@
+# ═══════════════════════════════════════════════════════
+# Máximun Hermes Agent — Configuración Principal
+# Arquitectura HRM Híbrida Multi-LLM
+# ═══════════════════════════════════════════════════════
+
+agent:
+  name: "Máximun"
+  type: "hermes"
+  version: "0.1.0"
+  language: "es"
+  mode: "local_offline"
+
+# ─── Hardware Profile ─────────────────────────────────
+hardware:
+  platform: "android_arm64"
+  arch: "aarch64"
+  cores: 4
+  ram_gb: 5.5
+  storage_available_gb: 183
+  gpu: "none"
+  profile: "mobile_medium"  # mobile_low | mobile_medium | mobile_high | desktop
+
+# ─── Model Configuration (HRM Hierarchy) ─────────────
+models:
+  # Modelos GGUF cuantizados para esta hardware
+  # Se descargan automáticamente desde HuggingFace
+
+  planner:
+    # Nivel alto: Planificación y razonamiento complejo
+    # Qwen 2.5 1.5B Q4_K_M — excelente razonamiento
+    model_id: "Qwen/Qwen2.5-1.5B-Instruct-GGUF"
+    filename: "Qwen2.5-1.5B-Instruct-Q4_K_M.gguf"
+    repo: "bartowski/Qwen2.5-1.5B-Instruct-GGUF"
+    quantization: "Q4_K_M"
+    context_length: 4096
+    max_tokens: 1024
+    temperature: 0.7
+    n_gpu_layers: 0
+    n_threads: 4
+    role: "planner"
+    description: "Planificador de alto nivel — descompone tareas complejas"
+
+  reasoner:
+    # Nivel medio: Razonamiento y análisis
+    # SmolLM2 1.7B Q4_K_M — rápido y capaz
+    model_id: "HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF"
+    filename: "smollm2-1.7b-instruct-q4_k_m.gguf"
+    repo: "HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF"
+    quantization: "Q4_K_M"
+    context_length: 4096
+    max_tokens: 1024
+    temperature: 0.5
+    n_gpu_layers: 0
+    n_threads: 4
+    role: "reasoner"
+    description: "Razonador intermedio — análisis y síntesis"
+
+  worker:
+    # Nivel bajo: Tareas rápidas y generación
+    # TinyLlama 1.1B Q4_K_M — ultrarrápido
+    model_id: "TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF"
+    filename: "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf"
+    repo: "TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF"
+    quantization: "Q4_K_M"
+    context_length: 2048
+    max_tokens: 512
+    temperature: 0.3
+    n_gpu_layers: 0
+    n_threads: 4
+    role: "worker"
+    description: "Trabajador rápido — generación de texto, respuestas simples"
+
+  embeddings:
+    # Embeddings para RAG
+    model_id: "all-MiniLM-L6-v2"
+    filename: "all-MiniLM-L6-v2"
+    repo: "sentence-transformers/all-MiniLM-L6-v2"
+    dimension: 384
+    role: "embeddings"
+    description: "Embeddings ligeros para búsqueda semántica"
+
+# ─── HRM Architecture Settings ────────────────────────
+hrm:
+  enabled: true
+  hierarchy:
+    level_1: "planner"      # Planificación de alto nivel
+    level_2: "reasoner"     # Razonamiento y análisis
+    level_3: "worker"       # Ejecución rápida
+  routing:
+    strategy: "cascade"     # cascade | parallel | adaptive
+    confidence_threshold: 0.7
+    escalation_threshold: 0.5
+    max_iterations: 5
+  delegation:
+    simple_tasks: "worker"
+    medium_tasks: "reasoner"
+    complex_tasks: "planner"
+
+# ─── Memory System ────────────────────────────────────
+memory:
+  # Memoria de trabajo (RAM) — contexto activo
+  working:
+    max_tokens: 4096
+    ttl_seconds: 3600
+
+  # Memoria a corto plazo — sesiones recientes
+  short_term:
+    max_sessions: 20
+    max_tokens_per_session: 8192
+    storage: "memory/short_term/sessions.jsonl"
+
+  # Memoria a largo plazo — conocimiento acumulado
+  long_term:
+    enabled: true
+    storage: "memory/long_term/knowledge.db"
+    max_entries: 10000
+    decay_rate: 0.01
+
+  # RAG — Retrieval Augmented Generation
+  rag:
+    enabled: true
+    vector_store: "memory/vector_store/chroma"
+    embedding_model: "embeddings"
+    chunk_size: 512
+    chunk_overlap: 64
+    top_k: 5
+    similarity_threshold: 0.3
+
+# ─── Tools & Skills ───────────────────────────────────
+tools:
+  device_access: true
+  web_access: false
+  filesystem_access: true
+  auto_discover: true
+  skill_directory: "skills/plugins"
+
+# ─── Logging ──────────────────────────────────────────
+logging:
+  level: "info"
+  directory: "logs"
+  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+  max_file_size_mb: 10
+  backup_count: 5
+
+# ─── API Server ───────────────────────────────────────
+server:
+  enabled: true
+  host: "127.0.0.1"
+  port: 8080
+  auth: false
+
+# ─── Migration ────────────────────────────────────────
+migration:
+  source_profile: "mobile_medium"
+  target_profiles:
+    - name: "mobile_high"
+      description: "Snapdragon 8 Gen 2 / 8GB RAM"
+      recommended_models:
+        planner: "qwen2.5-3b-instruct-q4_k_m.gguf"
+        reasoner: "phi-3-mini-4k-q4_k_m.gguf"
+        worker: "smollm2-1.7b-instruct-q4_k_m.gguf"
+    - name: "desktop"
+      description: "x86_64 / 16GB+ RAM"
+      recommended_models:
+        planner: "qwen2.5-7b-instruct-q4_k_m.gguf"
+        reasoner: "phi-3-medium-4k-q4_k_m.gguf"
+        worker: "smollm2-1.7b-instruct-q4_k_m.gguf"

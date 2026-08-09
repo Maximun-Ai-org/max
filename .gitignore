@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Models (too large for git)
+models/primary/*.gguf
+models/embeddings/*
+models/cache/*
+models/migrated/*
+!models/.gitkeep
+
+# Runtime
+logs/*.log
+data/cache/*
+data/sessions/*.jsonl
+memory/vector_store/chroma/*
+memory/long_term/*.db
+memory/short_term/*.jsonl
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE
+.vscode/
+.idea/
+
+# Build
+*.egg-info/
+dist/
+build/
+
+# Migration archives
+migrations/*.tar.gz
+migrations/rpi4b/opensuse/*.xz
+migrations/rpi4b/opensuse/*.img
+
+# Pytest
+.pytest_cache/
